@@ -1,0 +1,6 @@
+FROM node:10 as build
+WORKDIR /app
+COPY . .
+EXPOSE 4884
+RUN yarn install
+CMD yarn start
