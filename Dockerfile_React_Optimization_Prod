@@ -1,0 +1,34 @@
+FROM node:10 as build
+WORKDIR /usr/src/app
+COPY package.json yarn.lock ./
+RUN yarn install
+COPY . .
+RUN yarn run build
+
+
+FROM nginx:alpine
+COPY --from=build /usr/src/app/build /usr/share/nginx/html
+COPY --from=build /usr/src/app/nginx.conf /etc/nginx/conf.d/
+
+
+
+#we must configure nginx.conf here configuration
+server {
+
+  listen 4884;
+
+
+
+  location / {
+    root /usr/share/nginx/html;
+    index index.html index.htm;
+    try_files $uri $uri/ /index.html;
+  }
+
+   error_page   500 502 503 504  /50x.html;
+
+  location = /50x.html {
+    root   /usr/share/nginx/html;
+  }
+
+}
